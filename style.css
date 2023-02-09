@@ -1,0 +1,14 @@
+ul {
+    background-color: rgb(14, 135, 206);
+}
+li {
+    list-style: none !important;
+    display: flex;
+
+}
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+}
