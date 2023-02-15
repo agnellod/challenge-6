@@ -1,9 +1,15 @@
 ul {
     background-color: rgb(14, 135, 206);
+    margin: 5px;
+    padding: 1%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
 li {
     list-style: none !important;
-    display: flex;
+    
 
 }
 .row {
