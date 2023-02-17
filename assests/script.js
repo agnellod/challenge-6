@@ -40,47 +40,59 @@
         //  add x.wind
         // add x.humidity
         // append x card to some div
-
-
-// localStorage
-    // when the page loads grab all the cities in localStorage
-    // when a city name is input into the form and the search button is clicked, append the city to existing localStorage
-    // 
-
-
-// fetch call #1 (user will enter city name)
+        
+        
+        // localStorage
+        // when the page loads grab all the cities in localStorage
+        // when a city name is input into the form and the search button is clicked, append the city to existing localStorage
+        // 
+        
+        
+        // fetch call #1 (user will enter city name)
         // returns lag and long
-
-// fetch call #2 (takes in lat and long)
-    // returns weather data
-
-// fetch #3 (takes in icon id)
-    // returnns the actual image
-    var city = $('#search-city');
-    var searchBtn = $('#search-button');
-    var pastSearches = $('#past-cities');
-    var currentCity;
-    var currentWeather =$('#current-weather');
-    var fiveDayForecast =$('#5-day-forecast');
-    // (5 day forecast api) api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
-    //  (current weather api)  https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
-    // (current weather api by city) https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-
-
-    
-
-    const apiKey = "5361f87737b04f25bdea22949654ddb1"
+        
+        // fetch call #2 (takes in lat and long)
+        // returns weather data
+        
+        // fetch #3 (takes in icon id)
+        // returnns the actual image
+        var city = $('#search-city');
+        var searchBtn = $('#search-button');
+        var pastSearches = $('#past-cities');
+        var currentCity;
+        var currentWeather =$('#current-weather');
+        var fiveDayForecast =$('#5-day-forecast');
+        var pastCity = JSON.parse(localStorage.getItem("past-cities")) || []
+        // (5 day forecast api) api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
+        //  (current weather api)  https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+        // (current weather api by city) https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+        // dataContainer.innerHTML = ""; 
+        
+        
+        
+        
+        const apiKey = "5361f87737b04f25bdea22949654ddb1"
     
 
     var geoLocation = function(event) {
-        event.preventDefault()
-        var cityApi = `https://api.openweathermap.org/data/2.5/weather?q=${city.val()}&appid=${apiKey}&units=imperial`;
+        event.preventDefault();
+        var cityVal = city.val()
+        if ($(this).attr("id") === "search-button") {
+            pastCity.push(city.val());
+            renderSearch();
+            }
+            else {
+                cityVal = $(this).text();
+            }
+        localStorage.setItem("past-cities", JSON.stringify(pastCity));
+        var cityApi = `https://api.openweathermap.org/data/2.5/weather?q=${cityVal}&appid=${apiKey}&units=imperial`;
         fetch (cityApi)
         .then(function (response) {
             return response.json()
             
         })
         .then(function(data) {
+            currentWeather.empty();
             forecast(data)
             console.log(data);
             const ulEl = $('<ul>');
@@ -113,8 +125,8 @@
         })
 
     };
-    var forecast = function() {
-        var fiveDayApi = `https://api.openweathermap.org/data/2.5/forecast?q=${city.val()}&appid=${apiKey}&units=imperial`
+    var forecast = function(data) {
+        var fiveDayApi = `https://api.openweathermap.org/data/2.5/forecast?q=${data.name}&appid=${apiKey}&units=imperial`
         fetch (fiveDayApi)
         .then(function (response) {
             return response.json()
@@ -122,6 +134,7 @@
         })
         .then(function(data) {
             var arrayList = data.list;
+            fiveDayForecast.empty();
             for (var i = 0; i < arrayList.length; i++) {
                 if (arrayList[i].dt_txt.split(' ')[1] === '12:00:00') {
                     console.log(arrayList[i]);
@@ -145,12 +158,23 @@
             ulEl.append(liWindEl);
             console.log(data);
             fiveDayForecast.append(ulEl);
-            }
+            } 
         }
+        
 
 });  
 }
+function renderSearch(){
+    pastSearches.empty();
+    for (let i = 0; i < pastCity.length; i++) {
+    const city = pastCity[i];
+    var btn = $('<button>');
+    btn.text(city);
+    pastSearches.append(btn);
+}
 
-
+}
     searchBtn.on("click", geoLocation);
+    pastSearches.on("click", "button", geoLocation);
+    renderSearch();
    
